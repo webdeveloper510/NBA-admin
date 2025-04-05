@@ -13,8 +13,8 @@ const Dashboard = () => {
     {
       title: "Rustic Farmhouse",
       description: "Perfect for countryside weddings.",
-      price: null, // Optional
-      external_url: null, // Optional
+      price: null, 
+      external_url: null, 
       media: "https://via.placeholder.com/100"
     },
     {

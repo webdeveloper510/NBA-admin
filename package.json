@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.5.1",
     "csv-writer": "^1.6.0",
+    "formik": "^2.4.6",
     "json2csv": "^6.0.0-alpha.2",
     "react": "^18.2.0",
     "react-data-table-component": "^7.5.4",
