@@ -28,17 +28,17 @@ export const logout = () => {
 const token = getAccessToken();
 if (token) {
   apiClient.defaults.headers.Authorization = `Bearer ${token}`;
-  console.log("Token loaded from localStorage on app init",token);
+  console.log("Token loaded from localStorage on app init", token);
 }
 
 
 export const loginUser = async (credentials) => {
   try {
     const response = await axios.post(`${API_URL}/login`, credentials);
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Login error:", error.response?.data || error.message);
-    return error; 
+    return error;
   }
 };
 
@@ -54,9 +54,24 @@ export const addmedia = async (websiteData) => {
     });
     console.log(localStorage.getItem("token"));
     return response.data;
-    
+
   } catch (error) {
     console.error("Error adding addmedia:", error.response?.data || error.message);
     return error;
+  }
+};
+
+export const getadmindata = async (accessToken) => {
+  try {
+    const response = await axios.get(`${API_URL}/get-admin-data`, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    console.log("🚀 ~ getadmindata ~ response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching websites:", error);
+    return { status: "error", data: [] };
   }
 };

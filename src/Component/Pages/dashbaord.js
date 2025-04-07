@@ -1,30 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "../css/dashboard.css";
-
+import { getadmindata } from "../../Api";
+import { toast } from "react-toastify";
 const Dashboard = () => {
-  const dummyData = [
-    {
-      title: "Modern Wedding Venue",
-      description: "A beautiful venue for weddings and receptions.",
-      price: "$1,200",
-      external_url: "https://example.com/venue/1",
-      media: "https://via.placeholder.com/100"
-    },
-    {
-      title: "Rustic Farmhouse",
-      description: "Perfect for countryside weddings.",
-      price: null, 
-      external_url: null, 
-      media: "https://via.placeholder.com/100"
-    },
-    {
-      title: "Urban Rooftop",
-      description: "A stylish rooftop venue in the city.",
-      price: "$1,800",
-      external_url: "https://example.com/venue/3",
-      media: "https://via.placeholder.com/100"
-    }
-  ];
+  const [admindata, setadmindata] = useState([]);
+
+  useEffect(() => {
+    const loadAdminData = async () => {
+      console.log("hello")
+      const token = localStorage.getItem("accessToken");
+      try {
+        const response = await getadmindata(token);
+        console.log("🚀 ~ API Responsekkk:", response.data);
+        setadmindata(response.data);
+      } catch (error) {
+        console.error("Error fetching getadmindata:", error);
+      }
+    };
+
+    loadAdminData();
+  }, []);
+
+
 
   return (
     <div className="w-10/12 mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
@@ -43,7 +40,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {dummyData.map((venue, index) => (
+            {admindata.map((venue, index) => (
               <tr key={index} className="text-center">
                 <td className="border border-gray-300 p-2">{index + 1}</td>
                 <td className="border border-gray-300 p-2">{venue.title}</td>
@@ -52,9 +49,9 @@ const Dashboard = () => {
                   {venue.price || "N/A"}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {venue.external_url ? (
+                  {venue.uploaded_at ? (
                     <a
-                      href={venue.external_url}
+                      href={venue.uploaded_at}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 underline"
@@ -66,8 +63,8 @@ const Dashboard = () => {
                   )}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {venue.media ? (
-                    <img src={venue.media} alt="Media" className="w-20 h-auto mx-auto" />
+                  {venue.file_url ? (
+                    <img src={venue.file_url} alt="Media" className="w-20 h-auto mx-auto" />
                   ) : (
                     "No Media"
                   )}

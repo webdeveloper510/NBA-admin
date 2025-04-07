@@ -14,8 +14,46 @@ const AddMedia = () => {
   const [preview, setPreview] = useState(null);
   const [file, setFile] = useState(null);
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({
+    title: false,
+    description: false,
+    file: false
+  });
 
-  const validate = () => {
+  const validate = (field, value) => {
+    const newErrors = { ...errors };
+
+    switch (field) {
+      case 'title':
+        if (!value.trim()) {
+          newErrors.title = "Title is required";
+        } else {
+          delete newErrors.title;
+        }
+        break;
+      case 'description':
+        if (!value.trim()) {
+          newErrors.description = "Description is required";
+        } else {
+          delete newErrors.description;
+        }
+        break;
+      case 'file':
+        if (!file && !formData.fileUrl) {
+          newErrors.file = "Please upload an image or video or provide a URL";
+        } else {
+          delete newErrors.file;
+        }
+        break;
+      default:
+        break;
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateAll = () => {
     const newErrors = {};
     if (!formData.title.trim()) {
       newErrors.title = "Title is required";
@@ -23,25 +61,37 @@ const AddMedia = () => {
     if (!formData.description.trim()) {
       newErrors.description = "Description is required";
     }
-    if (!file) {
-      newErrors.file = "Please upload an image or video";
+    if (!file && !formData.fileUrl) {
+      newErrors.file = "Please upload an image or video or provide a URL";
     }
-    return newErrors;
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
-
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear error on change
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    if (touched[name]) {
+      validate(name, value);
+    }
   };
 
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched({ ...touched, [name]: true });
+    validate(name, value);
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     setFile(selectedFile);
+    setTouched({ ...touched, file: true });
 
     if (!selectedFile) {
       setPreview(null);
+      validate('file', null);
       return;
     }
 
@@ -53,11 +103,24 @@ const AddMedia = () => {
       });
     };
     reader.readAsDataURL(selectedFile);
-    setErrors({ ...errors, file: "" }); // clear error
+    validate('file', selectedFile);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Touch all fields to show validation messages
+    setTouched({
+      title: true,
+      description: true,
+      file: true
+    });
+    
+    // Validate all fields
+    if (!validateAll()) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
     
     const mediaData = new FormData();
     mediaData.append("title", formData.title);
@@ -78,14 +141,20 @@ const AddMedia = () => {
       const response = await addmedia(mediaData, token);
       console.log("Upload successful:", response);
       if (response.status === 201) {
-        toast.success("Profile updated successfully");
-
+        toast.success("Media uploaded successfully");
+        // Reset the form
+        setFormData({ title: "", description: "", price: "", fileUrl: "" });
+        setFile(null);
+        setPreview(null);
+        setTouched({
+          title: false,
+          description: false,
+          file: false
+        });
+        setErrors({});
       } else {
-        toast.error(response.message || "Failed to update profile");
+        toast.error(response.message || "Failed to upload media");
       }
-      setFormData({ title: "", description: "", price: "", fileUrl: "" });
-      setFile(null);
-      setPreview(null);
     } catch (error) {
       console.error("Upload failed:", error.response?.data || error.message);
       toast.error(error.response?.data?.message || "Upload failed!");
@@ -106,8 +175,10 @@ const AddMedia = () => {
               placeholder="Enter a catchy title..."
               value={formData.title}
               onChange={handleChange}
+              onBlur={handleBlur}
+              className={touched.title && errors.title ? "error-input" : ""}
             />
-            {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
+            {touched.title && errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
           </div>
 
           <div className="form-group">
@@ -118,8 +189,10 @@ const AddMedia = () => {
               placeholder="Describe your media..."
               value={formData.description}
               onChange={handleChange}
+              onBlur={handleBlur}
+              className={touched.description && errors.description ? "error-input" : ""}
             />
-            {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+            {touched.description && errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
           </div>
 
           <div className="form-group">
@@ -142,7 +215,12 @@ const AddMedia = () => {
               type="url"
               placeholder="https://example.com/media"
               value={formData.fileUrl}
-              onChange={handleChange}
+              onChange={(e) => {
+                handleChange(e);
+                if (e.target.value) {
+                  validate('file', e.target.value);
+                }
+              }}
             />
           </div>
 
@@ -155,9 +233,10 @@ const AddMedia = () => {
                   type="file"
                   accept="image/*, video/*"
                   onChange={handleFileChange}
+                  className={touched.file && errors.file ? "error-input" : ""}
                 />
               </label>
-              {errors.file && <p className="text-red-500 text-sm">{errors.file}</p>}
+              {touched.file && errors.file && <p className="text-red-500 text-sm">{errors.file}</p>}
             </div>
 
             {preview && (
