@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/admin/static/css/main.72da87a1.css",
-    "main.js": "/admin/static/js/main.af8dfacf.js",
+    "main.js": "/admin/static/js/main.f36949d5.js",
     "static/js/787.633816a4.chunk.js": "/admin/static/js/787.633816a4.chunk.js",
     "static/media/better_logo.png": "/admin/static/media/better_logo.dc80bce4abe3bd8a13ff.png",
     "index.html": "/admin/index.html",
     "main.72da87a1.css.map": "/admin/static/css/main.72da87a1.css.map",
-    "main.af8dfacf.js.map": "/admin/static/js/main.af8dfacf.js.map",
+    "main.f36949d5.js.map": "/admin/static/js/main.f36949d5.js.map",
     "787.633816a4.chunk.js.map": "/admin/static/js/787.633816a4.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.72da87a1.css",
-    "static/js/main.af8dfacf.js"
+    "static/js/main.f36949d5.js"
   ]
 }
